@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>PressKing</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;font-size:14px;transition:background .25s,color .25s;}
+
+/* ── DARK ── */
+body.dk{--bg:#0a0a0a;--bg2:#111;--border:#2a2a2a;--text:#fff;--text2:#999;--text3:#555;--card:#141414;--card-h:#1e1e1e;--inp:#0d0d0d;--strip:#0e0e0e;--icon:#ffffff;}
+/* ── LIGHT ── */
+body.lt{--bg:#f5f5f0;--bg2:#ffffff;--border:#ddd;--text:#1a1a1a;--text2:#666;--text3:#aaa;--card:#ffffff;--card-h:#fafafa;--inp:#f9f9f6;--strip:#eeeee8;--icon:#1a1a1a;}
+
+body{background:var(--bg);color:var(--text);}
+
+/* SVG icons inherit color */
+.icon svg{display:block;width:100%;height:100%;}
+.icon svg *[stroke]{stroke:var(--icon);fill:none;}
+.icon svg *[fill]:not([fill="none"]){fill:var(--icon);}
+
+/* NAV */
+nav{background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 28px;height:54px;position:sticky;top:0;z-index:200;}
+.logo{font-size:20px;font-weight:800;color:var(--text);white-space:nowrap;letter-spacing:-0.5px;}
+.logo span{color:#FFD600;}
+.nav-links{display:flex;align-items:center;height:54px;}
+.nav-dd{position:relative;height:100%;display:flex;align-items:center;}
+.nav-btn{background:none;border:none;color:var(--text2);font-size:13px;font-weight:500;padding:0 13px;height:100%;cursor:pointer;display:flex;align-items:center;gap:4px;white-space:nowrap;font-family:inherit;transition:color .15s;}
+.nav-btn:hover,.nav-btn.active{color:#FFD600;}
+.caret{width:10px;height:10px;transition:transform .2s;flex-shrink:0;opacity:.6;}
+.caret svg{display:block;}
+.caret svg path{stroke:currentColor;fill:none;}
+.nav-dd:hover .caret{transform:rotate(180deg);}
+.dd-menu{position:absolute;top:54px;left:0;min-width:200px;background:var(--bg2);border:1px solid var(--border);border-radius:11px;overflow:hidden;display:none;z-index:300;box-shadow:0 8px 24px rgba(0,0,0,.15);}
+.nav-dd:hover .dd-menu{display:block;}
+.dd-item{display:flex;align-items:center;gap:10px;padding:10px 14px;font-size:13px;color:var(--text2);cursor:pointer;border:none;background:none;width:100%;text-align:left;font-family:inherit;transition:background .15s,color .15s;}
+.dd-item:hover{background:#FFD600;color:#111;}
+.dd-item:hover .dd-icon svg *[stroke]{stroke:#111;}
+.dd-item:hover .dd-icon svg *[fill]:not([fill="none"]){fill:#111;}
+.dd-icon{width:16px;height:16px;flex-shrink:0;}
+.nav-right{display:flex;align-items:center;gap:8px;}
+.toggle-btn{background:var(--card);color:var(--text);border:1px solid var(--border);padding:6px 13px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:inherit;}
+.toggle-icon{width:14px;height:14px;flex-shrink:0;}
+.nav-cta{background:#FFD600;color:#111;border:none;padding:8px 18px;border-radius:8px;font-size:13px;font-weight:800;cursor:pointer;white-space:nowrap;font-family:inherit;}
+.nav-cta:hover{background:#e6c200;}
+
+/* HERO */
+.hero{text-align:center;padding:48px 24px 36px;background:var(--bg);}
+body.dk .hero{background:radial-gradient(ellipse 70% 50% at 50% 0%,#1a1400 0%,#0a0a0a 65%);}
+body.lt .hero{background:radial-gradient(ellipse 70% 50% at 50% 0%,#fffbe6 0%,#f5f5f0 65%);}
+.hero-badge{display:inline-flex;align-items:center;gap:7px;background:rgba(255,214,0,.1);border:1px solid rgba(255,214,0,.3);border-radius:40px;padding:5px 14px;font-size:11px;font-weight:700;color:#b59a00;margin-bottom:18px;letter-spacing:.8px;}
+.badge-dot{width:6px;height:6px;border-radius:50%;background:#FFD600;flex-shrink:0;}
+.hero h1{font-size:clamp(30px,5.5vw,58px);font-weight:800;letter-spacing:-2px;line-height:1.08;margin-bottom:12px;}
+.hero h1 span{color:#FFD600;}
+.hero p{font-size:15px;color:var(--text2);max-width:420px;margin:0 auto 26px;line-height:1.65;}
+.hero-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+.btn-y{background:#FFD600;color:#111;border:none;padding:12px 26px;border-radius:9px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;transition:background .15s;}
+.btn-y:hover{background:#e6c200;}
+.btn-o{background:transparent;color:var(--text);border:1.5px solid var(--border);padding:12px 26px;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:border-color .15s,color .15s;}
+.btn-o:hover{border-color:#FFD600;color:#FFD600;}
+
+/* PICKUP STRIP */
+.pickup-strip{background:var(--strip);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:24px;}
+.strip-label{font-size:10px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;color:#FFD600;margin-bottom:14px;text-align:center;}
+.ps-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:840px;margin:0 auto;}
+.ps-card{background:var(--card);border:1.5px solid var(--border);border-radius:13px;padding:20px 18px;cursor:pointer;transition:border-color .2s,box-shadow .2s,transform .15s;}
+.ps-card:hover{border-color:#FFD600;transform:translateY(-2px);box-shadow:0 4px 20px rgba(255,214,0,.1);}
+.ps-head{display:flex;align-items:center;gap:11px;margin-bottom:8px;}
+.ps-icon-box{width:38px;height:38px;border-radius:10px;background:rgba(255,214,0,.12);border:1px solid rgba(255,214,0,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ps-icon-box .icon{width:18px;height:18px;}
+.ps-card h3{font-size:14px;font-weight:800;color:var(--text);}
+.ps-card p{font-size:12px;color:var(--text2);line-height:1.55;margin-bottom:10px;}
+.ps-perks{display:flex;flex-direction:column;gap:4px;}
+.ps-perk{font-size:11px;color:#FFD600;display:flex;align-items:center;gap:5px;font-weight:600;}
+.ps-perk::before{content:'✓';font-weight:800;}
+.ps-book-btn{margin-top:12px;width:100%;background:#FFD600;color:#111;border:none;padding:8px;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;}
+.ps-book-btn:hover{background:#e6c200;}
+
+/* STATS */
+.stats{display:flex;flex-wrap:wrap;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--bg2);}
+.stat{flex:1;min-width:90px;padding:16px 10px;text-align:center;border-right:1px solid var(--border);}
+.stat:last-child{border-right:none;}
+.stat-n{font-size:24px;font-weight:800;color:#FFD600;}
+.stat-l{font-size:11px;color:var(--text3);margin-top:3px;}
+
+/* SECTIONS */
+.sec{padding:44px 24px;}
+.sec-inner{max-width:1020px;margin:0 auto;}
+.sec-tag{font-size:10px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;color:#FFD600;margin-bottom:7px;}
+.sec-title{font-size:clamp(22px,3.5vw,34px);font-weight:800;letter-spacing:-1px;color:var(--text);margin-bottom:7px;}
+.sec-sub{font-size:13px;color:var(--text2);max-width:420px;line-height:1.6;}
+
+/* SERVICE CARDS */
+.svc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:12px;margin-top:26px;}
+.svc-card{background:var(--card);border:1.5px solid var(--border);border-radius:13px;padding:22px 18px;cursor:pointer;transition:border-color .2s,box-shadow .2s,transform .15s;}
+.svc-card:hover{border-color:#FFD600;transform:translateY(-3px);box-shadow:0 6px 24px rgba(255,214,0,.1);}
+.svc-icon-box{width:50px;height:50px;border-radius:12px;background:rgba(255,214,0,.1);border:1px solid rgba(255,214,0,.2);display:flex;align-items:center;justify-content:center;margin-bottom:14px;}
+.svc-icon-box .icon{width:24px;height:24px;}
+.svc-card h3{font-size:15px;font-weight:800;color:var(--text);margin-bottom:6px;}
+.svc-card p{font-size:12px;color:var(--text2);line-height:1.55;margin-bottom:10px;}
+.svc-price{display:inline-block;background:rgba(255,214,0,.12);color:#b59a00;border:1px solid rgba(255,214,0,.25);padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
+body.dk .svc-price{color:#FFD600;}
+
+/* HOW IT WORKS */
+.how-bg{background:var(--strip);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.steps{display:flex;flex-wrap:wrap;margin-top:26px;}
+.step{flex:1;min-width:130px;padding:16px;position:relative;}
+.step:not(:last-child)::after{content:'→';position:absolute;right:-4px;top:22px;color:var(--border);font-size:18px;}
+.step-n{width:34px;height:34px;border-radius:50%;background:rgba(255,214,0,.12);border:1.5px solid rgba(255,214,0,.3);color:#FFD600;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;margin-bottom:10px;}
+.step h4{font-size:13px;font-weight:800;color:var(--text);margin-bottom:3px;}
+.step p{font-size:12px;color:var(--text2);line-height:1.5;}
+
+/* PICKUP DETAIL */
+.pk-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:26px;}
+.pk-card{border:1.5px solid var(--border);border-radius:13px;padding:24px 20px;background:var(--card);cursor:pointer;transition:border-color .2s,box-shadow .2s,transform .15s;}
+.pk-card:hover{border-color:#FFD600;transform:translateY(-2px);box-shadow:0 6px 24px rgba(255,214,0,.1);}
+.pk-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 11px;border-radius:20px;font-size:10px;font-weight:800;letter-spacing:.5px;margin-bottom:11px;}
+.badge-y{background:rgba(255,214,0,.12);color:#b59a00;border:1px solid rgba(255,214,0,.25);}
+body.dk .badge-y{color:#FFD600;}
+.badge-g{background:rgba(120,120,120,.1);color:var(--text3);border:1px solid var(--border);}
+.pk-card h3{font-size:17px;font-weight:800;color:var(--text);margin-bottom:6px;}
+.pk-card p{font-size:12px;color:var(--text2);line-height:1.55;margin-bottom:12px;}
+.pk-perks{display:flex;flex-direction:column;gap:5px;}
+.pk-perk{font-size:12px;color:var(--text2);display:flex;align-items:center;gap:7px;}
+.pk-perk::before{content:'✓';color:#FFD600;font-weight:800;font-size:11px;}
+.pk-btn{margin-top:16px;width:100%;background:#FFD600;color:#111;border:none;padding:10px;border-radius:9px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;}
+.pk-btn:hover{background:#e6c200;}
+
+/* MODAL */
+.modal-wrap{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:500;align-items:center;justify-content:center;padding:16px;}
+.modal-wrap.open{display:flex;}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:16px;width:100%;max-width:490px;max-height:92vh;overflow-y:auto;padding:28px 24px;position:relative;}
+.modal-close{position:absolute;top:14px;right:16px;background:none;border:none;color:var(--text2);font-size:20px;cursor:pointer;font-family:inherit;line-height:1;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:6px;}
+.modal-close:hover{background:var(--card);color:var(--text);}
+.modal-title{font-size:18px;font-weight:800;color:var(--text);margin-bottom:3px;}
+.modal-sub{font-size:12px;color:var(--text2);margin-bottom:20px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.fg{display:flex;flex-direction:column;gap:5px;margin-bottom:12px;}
+.fg label{font-size:11px;font-weight:700;color:var(--text2);letter-spacing:.3px;text-transform:uppercase;}
+.fg input,.fg select,.fg textarea{background:var(--inp);border:1.5px solid var(--border);border-radius:9px;padding:10px 12px;font-size:13px;color:var(--text);font-family:inherit;width:100%;outline:none;transition:border-color .2s;}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:#FFD600;box-shadow:0 0 0 3px rgba(255,214,0,.1);}
+.fg select option{background:var(--bg2);color:var(--text);}
+.fg textarea{resize:vertical;min-height:70px;}
+.addr-wrap{position:relative;}
+.addr-input{padding-right:40px !important;}
+.addr-detect{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text2);display:flex;align-items:center;padding:4px;}
+.addr-detect:hover{color:#FFD600;}
+.addr-detect .icon{width:16px;height:16px;}
+.addr-suggestions{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--bg2);border:1px solid var(--border);border-radius:9px;overflow:hidden;z-index:100;display:none;}
+.addr-suggestions.show{display:block;}
+.addr-sug-item{padding:9px 12px;font-size:12px;color:var(--text);cursor:pointer;border-bottom:1px solid var(--border);transition:background .15s;}
+.addr-sug-item:last-child{border-bottom:none;}
+.addr-sug-item:hover{background:rgba(255,214,0,.1);color:#b59a00;}
+body.dk .addr-sug-item:hover{color:#FFD600;}
+.addr-loading{padding:10px 12px;font-size:12px;color:var(--text2);text-align:center;}
+.modal-submit{width:100%;background:#FFD600;color:#111;border:none;padding:13px;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;margin-top:4px;font-family:inherit;}
+.modal-submit:hover{background:#e6c200;}
+.success-box{text-align:center;padding:24px 0;}
+.success-icon{width:56px;height:56px;background:rgba(255,214,0,.15);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;}
+.success-icon .icon{width:28px;height:28px;}
+.success-box h3{font-size:18px;font-weight:800;color:var(--text);margin-bottom:7px;}
+.success-box p{font-size:13px;color:var(--text2);line-height:1.6;}
+
+/* FOOTER */
+footer{background:var(--bg2);border-top:1px solid var(--border);padding:28px 24px;text-align:center;}
+.footer-logo{font-size:19px;font-weight:800;color:var(--text);}
+.footer-logo span{color:#FFD600;}
+footer p{font-size:12px;color:var(--text3);margin-top:5px;}
+
+@media(max-width:600px){
+  .nav-links{display:none;}
+  .ps-grid,.pk-grid,.form-row{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body class="dk">
+
+<!-- SVG ICON DEFS (inline, reusable) -->
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="i-steam" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="currentColor" d="M12 2c0 3-3 3-3 6s3 3 3 6-3 3-3 6"/>
+    <path stroke="currentColor" d="M17 4c0 3-3 3-3 6s3 3 3 6-3 3-3 6"/>
+    <path stroke="currentColor" d="M7 4c0 3-3 3-3 6s3 3 3 6-3 3-3 6"/>
+  </symbol>
+  <symbol id="i-vacuum" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="2" y="14" width="14" height="6" rx="2" stroke="currentColor"/>
+    <path stroke="currentColor" d="M16 17h3a3 3 0 0 0 0-6h-3"/>
+    <path stroke="currentColor" d="M6 14V8a4 4 0 0 1 4-4h4"/>
+  </symbol>
+  <symbol id="i-shirt" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="currentColor" d="M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.57a1 1 0 0 0 .99.84H6v10a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V10h2.15a1 1 0 0 0 .99-.84l.58-3.57a2 2 0 0 0-1.34-2.23z"/>
+  </symbol>
+  <symbol id="i-dress" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="currentColor" d="M12 2l-4 6h8l-4-6z"/>
+    <path stroke="currentColor" d="M8 8l-5 13h18L16 8"/>
+    <line x1="8" y1="8" x2="16" y2="8" stroke="currentColor"/>
+  </symbol>
+  <symbol id="i-store" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="currentColor" d="M3 9l1-5h16l1 5"/>
+    <path stroke="currentColor" d="M3 9a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0"/>
+    <path stroke="currentColor" d="M5 22V11.5M19 22V11.5"/>
+    <rect x="9" y="14" width="6" height="8" rx="1" stroke="currentColor"/>
+    <line x1="3" y1="22" x2="21" y2="22" stroke="currentColor"/>
+  </symbol>
+  <symbol id="i-car" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="currentColor" d="M5 17H3a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1l3-4h10l3 4h1a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-2"/>
+    <circle cx="7.5" cy="17.5" r="2.5" stroke="currentColor"/>
+    <circle cx="16.5" cy="17.5" r="2.5" stroke="currentColor"/>
+  </symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="5" stroke="currentColor"/>
+    <line x1="12" y1="1" x2="12" y2="3" stroke="currentColor"/>
+    <line x1="12" y1="21" x2="12" y2="23" stroke="currentColor"/>
+    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="currentColor"/>
+    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="currentColor"/>
+    <line x1="1" y1="12" x2="3" y2="12" stroke="currentColor"/>
+    <line x1="21" y1="12" x2="23" y2="12" stroke="currentColor"/>
+    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="currentColor"/>
+    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="currentColor"/>
+  </symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="currentColor" d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+  </symbol>
+  <symbol id="i-location" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="currentColor" d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+    <circle cx="12" cy="10" r="3" stroke="currentColor"/>
+  </symbol>
+  <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="20 6 9 17 4 12" stroke="currentColor"/>
+  </symbol>
+  <symbol id="i-iron" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="currentColor" d="M3 17h14a4 4 0 0 0 4-4V9H3v8z"/>
+    <path stroke="currentColor" d="M3 9V7a2 2 0 0 1 2-2h6"/>
+    <line x1="7" y1="21" x2="7" y2="17" stroke="currentColor"/>
+    <line x1="11" y1="21" x2="11" y2="17" stroke="currentColor"/>
+  </symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="currentColor" d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.45 2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6.18 6.18l.91-1.84a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+  </symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="currentColor" d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+    <polyline points="22,6 12,13 2,6" stroke="currentColor"/>
+  </symbol>
+  <symbol id="i-crosshair" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="10" stroke="currentColor"/>
+    <line x1="22" y1="12" x2="18" y2="12" stroke="currentColor"/>
+    <line x1="6" y1="12" x2="2" y2="12" stroke="currentColor"/>
+    <line x1="12" y1="6" x2="12" y2="2" stroke="currentColor"/>
+    <line x1="12" y1="22" x2="12" y2="18" stroke="currentColor"/>
+  </symbol>
+</svg>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">Press<span>King</span></div>
+  <div class="nav-links">
+    <div class="nav-dd">
+      <button class="nav-btn">Services <span class="caret"><svg viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span></button>
+      <div class="dd-menu">
+        <button class="dd-item" onclick="openModal('steam')"><span class="dd-icon icon"><svg><use href="#i-steam"/></svg></span>Steam Iron</button>
+        <button class="dd-item" onclick="openModal('vacuum')"><span class="dd-icon icon"><svg><use href="#i-vacuum"/></svg></span>Vacuum Iron</button>
+        <button class="dd-item" onclick="openModal('formal')"><span class="dd-icon icon"><svg><use href="#i-shirt"/></svg></span>Formals</button>
+        <button class="dd-item" onclick="openModal('ethnic')"><span class="dd-icon icon"><svg><use href="#i-dress"/></svg></span>Ethnic &amp; Delicates</button>
+      </div>
+    </div>
+    <div class="nav-dd">
+      <button class="nav-btn">Pickup &amp; Drop <span class="caret"><svg viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span></button>
+      <div class="dd-menu">
+        <button class="dd-item" onclick="openModal('self')"><span class="dd-icon icon"><svg><use href="#i-store"/></svg></span>Self Pickup &amp; Drop</button>
+        <button class="dd-item" onclick="openModal('wepick')"><span class="dd-icon icon"><svg><use href="#i-car"/></svg></span>We Pick &amp; Drop</button>
+      </div>
+    </div>
+    <div class="nav-dd">
+      <button class="nav-btn" onclick="smoothTo('howitworks')">How It Works</button>
+    </div>
+  </div>
+  <div class="nav-right">
+    <button class="toggle-btn" id="tBtn" onclick="toggleMode()">
+      <span class="toggle-icon icon" id="toggleIcon"><svg><use href="#i-sun"/></svg></span>
+      <span id="toggleLabel">Light</span>
+    </button>
+    <button class="nav-cta" onclick="openModal('general')">Book Now</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge"><span class="badge-dot"></span>PROFESSIONAL IRONING · HYDERABAD</div>
+  <h1>Clothes Ironed to<br/><span>Perfection</span></h1>
+  <p>Steam iron, vacuum iron, or self pick-up — crisp fresh clothes delivered fast. Starting at ₹5/piece.</p>
+  <div class="hero-btns">
+    <button class="btn-y" onclick="openModal('general')">Book a Pickup</button>
+    <button class="btn-o" onclick="smoothTo('services')">See Services</button>
+  </div>
+</div>
+
+<!-- PICKUP STRIP -->
+<div class="pickup-strip">
+  <div class="strip-label">Choose Your Pickup Option</div>
+  <div class="ps-grid">
+    <div class="ps-card">
+      <div class="ps-head">
+        <div class="ps-icon-box"><span class="icon" style="width:18px;height:18px;"><svg style="width:18px;height:18px;"><use href="#i-store"/></svg></span></div>
+        <h3>Self Pickup &amp; Drop</h3>
+      </div>
+      <p>Drop your clothes at our shop and collect when ready. No delivery fee.</p>
+      <div class="ps-perks">
+        <div class="ps-perk">No delivery fee</div>
+        <div class="ps-perk">Ready in 6–8 hours</div>
+        <div class="ps-perk">Instant confirmation</div>
+      </div>
+      <button class="ps-book-btn" onclick="openModal('self')">Book Self Pickup</button>
+    </div>
+    <div class="ps-card">
+      <div class="ps-head">
+        <div class="ps-icon-box"><span class="icon" style="width:18px;height:18px;"><svg style="width:18px;height:18px;"><use href="#i-car"/></svg></span></div>
+        <h3>We Pick &amp; Drop</h3>
+      </div>
+      <p>We collect from your address and deliver back — fully contactless.</p>
+      <div class="ps-perks">
+        <div class="ps-perk">Doorstep pickup &amp; delivery</div>
+        <div class="ps-perk">24-hour turnaround</div>
+        <div class="ps-perk">Small delivery charge applies</div>
+      </div>
+      <button class="ps-book-btn" onclick="openModal('wepick')">Book We Pick &amp; Drop</button>
+    </div>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat"><div class="stat-n">2000+</div><div class="stat-l">Happy customers</div></div>
+  <div class="stat"><div class="stat-n">₹5</div><div class="stat-l">Starting per piece</div></div>
+  <div class="stat"><div class="stat-n">24hr</div><div class="stat-l">Turnaround time</div></div>
+  <div class="stat"><div class="stat-n">4.9★</div><div class="stat-l">Average rating</div></div>
+</div>
+
+<!-- SERVICES -->
+<div class="sec" id="services">
+  <div class="sec-inner">
+    <div class="sec-tag">Our Services</div>
+    <div class="sec-title">Pick the iron that suits you</div>
+    <div class="sec-sub">From delicate silks to heavy formals — the right process for every garment.</div>
+    <div class="svc-grid">
+      <div class="svc-card" onclick="openModal('steam')">
+        <div class="svc-icon-box"><span class="icon" style="width:24px;height:24px;"><svg style="width:24px;height:24px;"><use href="#i-steam"/></svg></span></div>
+        <h3>Steam Iron</h3>
+        <p>High-temperature steam removes deep creases from cotton, linen, and blends.</p>
+        <span class="svc-price">From ₹7/piece</span>
+      </div>
+      <div class="svc-card" onclick="openModal('vacuum')">
+        <div class="svc-icon-box"><span class="icon" style="width:24px;height:24px;"><svg style="width:24px;height:24px;"><use href="#i-vacuum"/></svg></span></div>
+        <h3>Vacuum Iron</h3>
+        <p>Industrial vacuum table locks in crisp edges — ideal for formal wear.</p>
+        <span class="svc-price">From ₹10/piece</span>
+      </div>
+      <div class="svc-card" onclick="openModal('formal')">
+        <div class="svc-icon-box"><span class="icon" style="width:24px;height:24px;"><svg style="width:24px;height:24px;"><use href="#i-shirt"/></svg></span></div>
+        <h3>Formals</h3>
+        <p>Sharp creases for office shirts, suits, and blazers. Military-grade press.</p>
+        <span class="svc-price">From ₹12/piece</span>
+      </div>
+      <div class="svc-card" onclick="openModal('ethnic')">
+        <div class="svc-icon-box"><span class="icon" style="width:24px;height:24px;"><svg style="width:24px;height:24px;"><use href="#i-dress"/></svg></span></div>
+        <h3>Ethnic &amp; Delicates</h3>
+        <p>Sarees, kurtas, and embroidered garments handled with extra care.</p>
+        <span class="svc-price">From ₹15/piece</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<div class="how-bg" id="howitworks">
+  <div class="sec">
+    <div class="sec-inner">
+      <div class="sec-tag">How It Works</div>
+      <div class="sec-title">Ready in 4 simple steps</div>
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><h4>Book online</h4><p>Choose service &amp; pickup in 2 mins.</p></div>
+        <div class="step"><div class="step-n">2</div><h4>We collect</h4><p>Team picks up from your doorstep.</p></div>
+        <div class="step"><div class="step-n">3</div><h4>We iron</h4><p>Steam or vacuum ironed by experts.</p></div>
+        <div class="step"><div class="step-n">4</div><h4>Delivered back</h4><p>Crisp clothes back, neatly packed.</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PICKUP DETAIL -->
+<div class="sec" id="pickup">
+  <div class="sec-inner">
+    <div class="sec-tag">Delivery Options</div>
+    <div class="sec-title">Choose how you want it</div>
+    <div class="sec-sub">Drop off yourself or let us come to you.</div>
+    <div class="pk-grid">
+      <div class="pk-card" onclick="openModal('self')">
+        <div class="pk-badge badge-y">SELF PICKUP &amp; DROP</div>
+        <h3>You bring it, you collect it</h3>
+        <p>Drop clothes at our shop and pick up when ready. Save on delivery.</p>
+        <div class="pk-perks">
+          <div class="pk-perk">No delivery fee</div>
+          <div class="pk-perk">Ready in 6–8 hours</div>
+          <div class="pk-perk">Track order online</div>
+        </div>
+        <button class="pk-btn">Book Self Pickup</button>
+      </div>
+      <div class="pk-card" onclick="openModal('wepick')">
+        <div class="pk-badge badge-g">WE PICK &amp; DROP</div>
+        <h3>Stay home, we handle it</h3>
+        <p>We collect from your address and deliver back — contactless.</p>
+        <div class="pk-perks">
+          <div class="pk-perk">Doorstep pickup &amp; delivery</div>
+          <div class="pk-perk">24-hour turnaround</div>
+          <div class="pk-perk">Small delivery charge applies</div>
+        </div>
+        <button class="pk-btn">Book We Pick &amp; Drop</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Press<span>King</span></div>
+  <p style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px;">
+    <span class="icon" style="width:13px;height:13px;display:inline-flex;"><svg style="width:13px;height:13px;"><use href="#i-phone"/></svg></span>+91 90000 00000
+    &nbsp;·&nbsp;
+    <span class="icon" style="width:13px;height:13px;display:inline-flex;"><svg style="width:13px;height:13px;"><use href="#i-mail"/></svg></span>hello@pressking.in
+  </p>
+  <p style="margin-top:12px;">© 2025 PressKing · Hyderabad, Telangana</p>
+</footer>
+
+<!-- MODAL -->
+<div class="modal-wrap" id="modalWrap" onclick="closeOnBg(event)">
+  <div class="modal" id="modalBox">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<script>
+var isDark=true;
+document.body.className='dk';
+
+function toggleMode(){
+  isDark=!isDark;
+  document.body.className=isDark?'dk':'lt';
+  document.getElementById('toggleIcon').innerHTML='<svg style="width:14px;height:14px;"><use href="'+(isDark?'#i-sun':'#i-moon')+'"/></svg>';
+  document.getElementById('toggleLabel').textContent=isDark?'Light':'Dark';
+}
+function smoothTo(id){var el=document.getElementById(id);if(el)el.scrollIntoView({behavior:'smooth'});}
+function closeOnBg(e){if(e.target===document.getElementById('modalWrap'))closeModal();}
+function closeModal(){document.getElementById('modalWrap').classList.remove('open');}
+
+function submitBooking(){
+  var name=document.getElementById('bName').value.trim();
+  var phone=document.getElementById('bPhone').value.trim();
+  if(!name||!phone){alert('Please enter your name and phone number.');return;}
+  document.getElementById('modalContent').innerHTML=
+    '<div class="success-box">'+
+    '<div class="success-icon"><span class="icon" style="width:28px;height:28px;"><svg style="width:28px;height:28px;"><use href="#i-check"/></svg></span></div>'+
+    '<h3>Booking Confirmed!</h3>'+
+    '<p>We will call <strong>'+name+'</strong> on <strong>'+phone+'</strong><br/>within 30 minutes to confirm your booking.</p>'+
+    '<button class="pk-btn" style="margin-top:18px;max-width:180px;margin-left:auto;margin-right:auto;display:block;" onclick="closeModal()">Close</button>'+
+    '</div>';
+}
+
+// Address autocomplete (Google Places simulation — replace with real API key for production)
+var addrTimer;
+function initAddrField(){
+  var inp=document.getElementById('bAddr');
+  var sug=document.getElementById('addrSug');
+  if(!inp||!sug)return;
+  inp.addEventListener('input',function(){
+    clearTimeout(addrTimer);
+    var q=inp.value.trim();
+    if(q.length<3){sug.className='addr-suggestions';return;}
+    addrTimer=setTimeout(function(){fetchSuggestions(q,inp,sug);},400);
+  });
+  inp.addEventListener('blur',function(){setTimeout(function(){sug.className='addr-suggestions';},200);});
+}
+function fetchSuggestions(q,inp,sug){
+  // Simulates Google Places results for Hyderabad addresses
+  // In production: call Google Places Autocomplete API with your key
+  var hyderabadAreas=['Banjara Hills, Hyderabad','Jubilee Hills, Hyderabad','Hitech City, Hyderabad','Madhapur, Hyderabad','Gachibowli, Hyderabad','Kondapur, Hyderabad','Kukatpally, Hyderabad','Begumpet, Hyderabad','Secunderabad, Hyderabad','Ameerpet, Hyderabad','SR Nagar, Hyderabad','Malkajgiri, Hyderabad','LB Nagar, Hyderabad','Dilsukhnagar, Hyderabad','Uppal, Hyderabad'];
+  var filtered=hyderabadAreas.filter(function(a){return a.toLowerCase().indexOf(q.toLowerCase())>-1;}).slice(0,5);
+  if(filtered.length===0){sug.className='addr-suggestions';return;}
+  sug.innerHTML=filtered.map(function(a){
+    return '<div class="addr-sug-item" onclick="selectAddr(\''+a+'\')">'+
+      '<svg style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:6px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>'+a+'</div>';
+  }).join('');
+  sug.className='addr-suggestions show';
+}
+function selectAddr(val){
+  var inp=document.getElementById('bAddr');
+  var sug=document.getElementById('addrSug');
+  if(inp)inp.value=val;
+  if(sug)sug.className='addr-suggestions';
+}
+function detectLocation(){
+  var inp=document.getElementById('bAddr');
+  if(!inp)return;
+  if(!navigator.geolocation){inp.value='Location not supported';return;}
+  inp.value='Detecting your location...';
+  inp.disabled=true;
+  navigator.geolocation.getCurrentPosition(function(pos){
+    // In production: reverse geocode with Google Maps Geocoding API
+    inp.value='Hyderabad, Telangana (Location detected)';
+    inp.disabled=false;
+  },function(){
+    inp.value='';
+    inp.placeholder='Could not detect — please type your area';
+    inp.disabled=false;
+  });
+}
+
+var svcLabels={steam:'Steam Iron',vacuum:'Vacuum Iron',formal:'Formals',ethnic:'Ethnic & Delicates',self:'Self Pickup & Drop',wepick:'We Pick & Drop',general:'Book a Service'};
+var pickupMap={self:'Self Pickup & Drop',wepick:'We Pick & Drop'};
+var svcMap={steam:'Steam Iron',vacuum:'Vacuum Iron',formal:'Formals',ethnic:'Ethnic & Delicates'};
+
+function openModal(type){
+  var title=svcLabels[type]||'Book Now';
+  var pVal=pickupMap[type]||'';
+  var sVal=svcMap[type]||'';
+  var pHidden=!!pickupMap[type];
+  var sHidden=!!svcMap[type];
+
+  var pField=pHidden?
+    '<input type="hidden" id="bPickup" value="'+pVal+'"/>':
+    '<div class="fg"><label>Pickup Option</label><select id="bPickup"><option value="">Select...</option><option>Self Pickup & Drop</option><option>We Pick & Drop</option></select></div>';
+
+  var sField=sHidden?
+    '<input type="hidden" id="bSvc" value="'+sVal+'"/>':
+    '<div class="fg"><label>Service Type</label><select id="bSvc"><option value="">Select...</option><option>Steam Iron</option><option>Vacuum Iron</option><option>Formals</option><option>Ethnic & Delicates</option></select></div>';
+
+  document.getElementById('modalContent').innerHTML=
+    '<div class="modal-title">'+title+'</div>'+
+    '<div class="modal-sub">Fill in your details — we\'ll confirm within 30 minutes.</div>'+
+    '<div class="form-row">'+
+      '<div class="fg"><label>Full Name</label><input id="bName" type="text" placeholder="Your name"/></div>'+
+      '<div class="fg"><label>Phone Number</label><input id="bPhone" type="tel" placeholder="+91 9000000000"/></div>'+
+    '</div>'+
+    '<div class="fg"><label>Address / Area</label>'+
+      '<div class="addr-wrap">'+
+        '<input id="bAddr" class="addr-input" type="text" placeholder="Type your area or detect location" autocomplete="off"/>'+
+        '<button class="addr-detect" onclick="detectLocation()" title="Detect my location">'+
+          '<span class="icon addr-detect-icon" style="width:16px;height:16px;"><svg style="width:16px;height:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="22" y1="12" x2="18" y2="12"/><line x1="6" y1="12" x2="2" y2="12"/><line x1="12" y1="6" x2="12" y2="2"/><line x1="12" y1="22" x2="12" y2="18"/><circle cx="12" cy="12" r="3"/></svg></span>'+
+        '</button>'+
+        '<div id="addrSug" class="addr-suggestions"></div>'+
+      '</div>'+
+    '</div>'+
+    '<div class="form-row">'+sField+pField+'</div>'+
+    '<div class="fg"><label>Preferred Date &amp; Time</label><input id="bDate" type="datetime-local"/></div>'+
+    '<div class="fg"><label>Special Instructions (optional)</label><textarea id="bNote" placeholder="E.g. delicate fabric, specific creases..."></textarea></div>'+
+    '<button class="modal-submit" onclick="submitBooking()">Confirm Booking</button>';
+
+  document.getElementById('modalWrap').classList.add('open');
+  setTimeout(initAddrField,100);
+}
+</script>
+</body>
+</html>
